@@ -6,123 +6,145 @@ using UnityEngine;
 
 public class PlayerMove_SC : MonoBehaviour
 {
+    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float rotationSpeed = 10f; // Скорость разворота
-    [SerializeField] private bool clockwise = true;
-    [SerializeField] private float tiltAmount = 5f; // Максимальный угол наклона
-    [SerializeField] private float tiltSmoothness = 2f; // Плавность наклона
+    [SerializeField] private float rotationSpeed = 10f;
+    [SerializeField] private float stopDistance = 0.1f;
+    [SerializeField] private float fixedZPosition = -2f;
+    
+    [Header("Tilt Settings")] 
+    [SerializeField] private float tiltAmount = 5f;
+    [SerializeField] private float tiltSmoothness = 2f;
+    
+    private Rigidbody rb;
     private Vector3 targetPosition;
     private bool isMoving = false;
-
-    private Vector3 velocity;
-    [SerializeField] private float smoothTime = 0.2f;
-    
-    // Фиксированная Z-позиция пчелы (например, 0)
-    [SerializeField] private float fixedZPosition = -2f; 
-    private float currentTilt = 0f; // Текущий наклон по Z
-    private Quaternion initialRotation; // Начальный поворот без наклона
+    private float currentTilt;
 
     private void Start()
     {
-        initialRotation = transform.rotation;
+        rb = GetComponent<Rigidbody>();
+        targetPosition = rb.position; // Инициализация цели
     }
+
     private void Update()
     {
+        // Установка новой цели по клику
         if (Input.GetMouseButton(0))
         {
             SetTargetToMousePosition();
             isMoving = true;
         }
 
-        if (isMoving)
-        {
-            MoveToTarget();
-            ApplyMovementTilt();
-            RotateTowards();
-            
-        }
-        else
-        {
-            ReturnToNeutralTilt();
-        }
-    }
-    private void ApplyMovementTilt()
-    {
-        // Вычисляем наклон на основе скорости
-        float targetTilt = math.abs( velocity.x) * -1* tiltAmount;
-        
-        // Плавно изменяем наклон
-        currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSmoothness * Time.deltaTime);
-        
-        // Применяем наклон к текущему повороту
-        transform.rotation = transform.rotation * Quaternion.Euler(0, 0, currentTilt);
+        // Обработка наклона
+        HandleTilt();
     }
 
-    private void ReturnToNeutralTilt()
+    private void FixedUpdate()
     {
-        // Плавно возвращаем наклон в 0
-        currentTilt = Mathf.Lerp(currentTilt, 0f, tiltSmoothness * Time.deltaTime);
+        if (!isMoving) 
+        {
+            //transform.rotation = Quaternion.Euler(0,math.round(transform.rotation.y),0);
+            return;
+        }
         
-        // Сохраняем основной поворот, добавляя только наклон
-        Quaternion baseRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
-        transform.rotation = baseRotation * Quaternion.Euler(0, 0, currentTilt);
+        // Движение к цели
+        MoveToTarget();
         
-        // Альтернативный вариант - возврат к initialRotation
-        // transform.rotation = Quaternion.Slerp(transform.rotation, initialRotation, tiltSmoothness * Time.deltaTime);
+        // Поворот в сторону движения
+        RotateTowards();
+        
+        // Проверка достижения цели
+        CheckIfReached();
     }
 
     private void SetTargetToMousePosition()
     {
-        // 1. Берём луч от камеры до точки мыши
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.forward, Vector3.forward * fixedZPosition);
         
-        // 2. Вычисляем плоскость, в которой летает пчела (Z = fixedZPosition)
-        Plane beePlane = new Plane(Vector3.forward, new Vector3(0, 0, fixedZPosition));
-        
-        // 3. Находим пересечение луча и плоскости
-        if (beePlane.Raycast(ray, out float distance))
+        if (plane.Raycast(ray, out float distance))
         {
             targetPosition = ray.GetPoint(distance);
+            targetPosition.z = fixedZPosition; // Фиксируем Z
+            isMoving = true;
         }
     }
 
     private void MoveToTarget()
     {
-        transform.position = Vector3.SmoothDamp(
-            transform.position,
-            targetPosition,
-            ref velocity,
-            smoothTime,
-            moveSpeed
-        );
-
-        if (transform.position == targetPosition)
+        // Рассчитываем направление
+        Vector3 direction = (targetPosition - rb.position).normalized;
+        
+        // Простое движение с постоянной скоростью
+        rb.velocity = direction * moveSpeed;
+        
+        // Гарантируем фиксированную Z-позицию
+        if (Mathf.Abs(rb.position.z - fixedZPosition) > 0.01f)
         {
+            rb.position = new Vector3(rb.position.x, rb.position.y, fixedZPosition);
+        }
+    }
+
+   private void RotateTowards()
+    {
+        Vector3 direction = targetPosition - transform.position;
+        direction.z = 0;
+        direction.y = 0;
+        
+        if (direction.magnitude < 0.01f) return;
+        
+        direction.Normalize();
+        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        
+        // Основной поворот
+        Quaternion baseRotation = Quaternion.Euler(0, targetAngle, 0);
+        
+        // Добавляем наклон
+        Quaternion tiltRotation = Quaternion.Euler(0, 0, currentTilt);
+        
+        // Комбинируем
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            baseRotation * tiltRotation,
+            rotationSpeed * Time.deltaTime
+        );
+    }
+
+    private void CheckIfReached()
+    {
+        if (Vector3.Distance(rb.position, targetPosition) <= stopDistance)
+        {
+            rb.velocity = Vector3.zero;
             isMoving = false;
         }
     }
 
-    private void RotateTowards()
+    private void HandleTilt()
+{
+    // Только если есть движение и мы не врезались
+    if (isMoving && rb.velocity.magnitude > 0.1f)
     {
-        Vector3 direction = (targetPosition - transform.position).normalized *-1;
-        direction.z = 0; // Игнорируем глубину (ось Z), если движение 2D
+        // Берем направление к цели, а не текущую velocity
+        Vector3 targetDirection = (targetPosition - transform.position).normalized;
+        float targetTilt = -1*math.abs( targetDirection.x) * tiltAmount;
         
-        if (direction != Vector3.zero)
-        {
-            // Для вида сбоку поворачиваем объект по оси Y
-            float targetAngle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
-            
-            // Корректируем угол под твою систему координат
-            // (например, если 0° = "вправо", 180° = "влево")
-            Quaternion targetRotation = Quaternion.Euler(0, targetAngle + 90, 0);
-            
-            // Плавный поворот через Slerp (или RotateTowards)
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
-            );
-        }
+        // Ограничиваем максимальный наклон
+        targetTilt = Mathf.Clamp(targetTilt, -tiltAmount, tiltAmount);
+        
+        currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSmoothness * Time.deltaTime);
+    }
+    else
+    {
+        // Плавный возврат в исходное положение
+        currentTilt = Mathf.Lerp(currentTilt, 0f, tiltSmoothness * 2 * Time.deltaTime);
     }
 
+    // Применяем наклон ТОЛЬКО по оси Z
+    transform.rotation = Quaternion.Euler(
+        transform.rotation.eulerAngles.x,
+        transform.rotation.eulerAngles.y,
+        currentTilt
+    );
+}
 }
