@@ -4,17 +4,27 @@ using UnityEngine;
 
 public class PlayerGraber_SC : MonoBehaviour
 {
-    [SerializeField]ConfigurableJoint joint;
-
+    [SerializeField]HingeJoint joint;
+    [SerializeField]Vector3 jointOffset;
+    [SerializeField]GameObject obj_dot,grabed;
     void Update()
     {
-        if(!Input.GetMouseButton(1))joint.connectedBody=null;
+        //joint.connectedAnchor = Vector3.zero;
+        joint.anchor = transform.InverseTransformPoint(transform.position-jointOffset);
+        if(!Input.GetMouseButton(1)&&grabed!=null)
+        {
+            grabed.transform.SetParent(null);
+            grabed.GetComponent<Rigidbody>().isKinematic=false;
+            grabed=null;
+        }
     }
     void OnTriggerStay(Collider col)
     {
-        if (Input.GetMouseButton(1)){
+        if (Input.GetMouseButton(1)&&grabed==null){
             if(col.tag=="grabable"){
-                joint.connectedBody=col.gameObject.GetComponent<Rigidbody>();
+                col.transform.SetParent(obj_dot.transform);
+                grabed=col.gameObject;
+                col.GetComponent<Rigidbody>().isKinematic=true;
             }
         }
         

@@ -9,15 +9,23 @@ public class PlayerMove_SC : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 10f; // Скорость разворота
     [SerializeField] private bool clockwise = true;
+    [SerializeField] private float tiltAmount = 5f; // Максимальный угол наклона
+    [SerializeField] private float tiltSmoothness = 2f; // Плавность наклона
     private Vector3 targetPosition;
-    private bool isMoving = false, isRotating=false;
+    private bool isMoving = false;
 
     private Vector3 velocity;
     [SerializeField] private float smoothTime = 0.2f;
     
     // Фиксированная Z-позиция пчелы (например, 0)
     [SerializeField] private float fixedZPosition = -2f; 
+    private float currentTilt = 0f; // Текущий наклон по Z
+    private Quaternion initialRotation; // Начальный поворот без наклона
 
+    private void Start()
+    {
+        initialRotation = transform.rotation;
+    }
     private void Update()
     {
         if (Input.GetMouseButton(0))
@@ -29,10 +37,38 @@ public class PlayerMove_SC : MonoBehaviour
         if (isMoving)
         {
             MoveToTarget();
+            ApplyMovementTilt();
             RotateTowards();
+            
         }
+        else
+        {
+            ReturnToNeutralTilt();
+        }
+    }
+    private void ApplyMovementTilt()
+    {
+        // Вычисляем наклон на основе скорости
+        float targetTilt = math.abs( velocity.x) * -1* tiltAmount;
+        
+        // Плавно изменяем наклон
+        currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSmoothness * Time.deltaTime);
+        
+        // Применяем наклон к текущему повороту
+        transform.rotation = transform.rotation * Quaternion.Euler(0, 0, currentTilt);
+    }
 
-        //if(transform.rotation.z!=0 && isRotating==false)Z_rotator();
+    private void ReturnToNeutralTilt()
+    {
+        // Плавно возвращаем наклон в 0
+        currentTilt = Mathf.Lerp(currentTilt, 0f, tiltSmoothness * Time.deltaTime);
+        
+        // Сохраняем основной поворот, добавляя только наклон
+        Quaternion baseRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        transform.rotation = baseRotation * Quaternion.Euler(0, 0, currentTilt);
+        
+        // Альтернативный вариант - возврат к initialRotation
+        // transform.rotation = Quaternion.Slerp(transform.rotation, initialRotation, tiltSmoothness * Time.deltaTime);
     }
 
     private void SetTargetToMousePosition()
@@ -66,21 +102,6 @@ public class PlayerMove_SC : MonoBehaviour
         }
     }
 
-    async void Z_rotator(){
-        isRotating=true;
-        float a=transform.rotation.z/30;
-        for(int b=0;b<30;b++){
-            Quaternion quat= transform.rotation;
-            quat.z+=a;
-            transform.rotation =quat;
-            await Task.Delay(30);
-            if(transform.rotation.z==0){
-                isRotating=false;
-                return;
-            }
-        }
-        isRotating=false;
-    }
     private void RotateTowards()
     {
         Vector3 direction = (targetPosition - transform.position).normalized *-1;
