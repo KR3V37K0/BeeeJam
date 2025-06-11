@@ -1669,9 +1669,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d591b62c08d1945a915b40b7b84945, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelProgress: 0
+  LevelProgress: 1
   allMissions:
   - {fileID: 11400000, guid: 5b9b3e8cd2c745a4ca890e4ecd0389fd, type: 2}
+  - {fileID: 11400000, guid: 0ee2b0a27dc67e6418ea8fab0130651e, type: 2}
   canvas_home: {fileID: 987878299}
   canvas_level: {fileID: 950293476}
   txt_letter: {fileID: 1570067746}

@@ -55,6 +55,7 @@ public class PlayerGraber_SC : MonoBehaviour
         {
             Destroy(grabeds[i]);
         }
+        grabeds.Clear();
         Debug.Log("now " + grabeds.Count);
     }
 }
