@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class PlayerMove_SC : MonoBehaviour
 {
@@ -21,7 +22,19 @@ public class PlayerMove_SC : MonoBehaviour
     private Vector3 targetPosition;
     private bool isMoving = false;
     private float currentTilt;
+    private GameObject spawn;
 
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += onLoaded;
+    }
+    public void onLoaded(Scene scene, LoadSceneMode mode)
+    {
+        spawn = GameObject.FindWithTag("Respawn");
+        transform.position = spawn.transform.position;
+        transform.rotation = spawn.transform.rotation;
+    }
     private void Start()
     {
         rb = GetComponent<Rigidbody>();

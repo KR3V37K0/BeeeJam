@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class CameraMoveSC : MonoBehaviour
 {
     public Transform target;        // игрок или другой объект
@@ -9,9 +8,14 @@ public class CameraMoveSC : MonoBehaviour
 
     public Vector2 minBounds;       // минимальные координаты (X, Y)
     public Vector2 maxBounds;       // максимальные координаты (X, Y)
-    
+
     public Vector3 offset;          // смещение от игрока (если нужно)
 
+
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
     void LateUpdate()
     {
         if (target == null) return;
@@ -27,4 +31,5 @@ public class CameraMoveSC : MonoBehaviour
         // Плавное движение
         transform.position = Vector3.Lerp(transform.position, clampedPosition, smoothSpeed);
     }
+    
 }
