@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerMove_SC : MonoBehaviour
 {
@@ -60,6 +61,9 @@ public class PlayerMove_SC : MonoBehaviour
 
     private void SetTargetToMousePosition()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+        return;
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane plane = new Plane(Vector3.forward, Vector3.forward * fixedZPosition);
         
