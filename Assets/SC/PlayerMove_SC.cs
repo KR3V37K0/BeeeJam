@@ -24,6 +24,7 @@ public class PlayerMove_SC : MonoBehaviour
     private float currentTilt;
     private GameObject spawn;
 
+
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
