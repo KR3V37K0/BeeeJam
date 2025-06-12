@@ -36,6 +36,7 @@ public class Levels_Letters : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         SceneManager.sceneLoaded += event_LevelStarted;
+        img_fade.color = Color.black;
     }
     async public void btn_OpenLetter()
     {

@@ -25,10 +25,14 @@ public class PlayerGraber_SC : MonoBehaviour
         if (!Input.GetMouseButton(1) && grabed != null)
         {
             grabed.transform.SetParent(null);
-            grabed.GetComponent<Rigidbody>().isKinematic = false;
+            //grabed.GetComponent<Rigidbody>().isKinematic = false;
+            grabed.layer = LayerMask.NameToLayer("Default");
+            picked_rb.constraints = picked_rbconst;
             grabed = null;
         }
     }
+    RigidbodyConstraints picked_rbconst;
+    Rigidbody picked_rb;
     void OnTriggerStay(Collider col)
     {
         if (Input.GetMouseButton(1) && grabed == null)
@@ -37,7 +41,14 @@ public class PlayerGraber_SC : MonoBehaviour
             {
                 col.transform.SetParent(obj_dot.transform);
                 grabed = col.gameObject;
-                col.GetComponent<Rigidbody>().isKinematic = true;
+                //col.GetComponent<Rigidbody>().isKinematic = true;
+
+                picked_rb = col.GetComponent<Rigidbody>();
+                picked_rb.velocity = Vector3.zero;
+                picked_rb.angularVelocity = Vector3.zero;
+                picked_rbconst = picked_rb.constraints;
+                picked_rb.constraints = RigidbodyConstraints.FreezeAll;
+                grabed.layer = LayerMask.NameToLayer("onHand");
 
                 if (!grabeds.Contains(col.gameObject))
                 {
