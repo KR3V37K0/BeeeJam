@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using PrimeTween;
-using UnityEditor.UI;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 using UnityEditor;
@@ -16,6 +15,7 @@ public class Levels_Letters : MonoBehaviour
     [SerializeField] GameObject canvas_home, canvas_level;
 [Header("UI BASE")]
     [SerializeField] TMP_Text txt_letter;
+    [SerializeField] Button btn_Level;
 
 [Header("UI LEVEL")]
     [SerializeField] Image img_fade;
@@ -41,6 +41,8 @@ public class Levels_Letters : MonoBehaviour
     async public void btn_OpenLetter()
     {
         txt_letter.text = allMissions[LevelProgress].letter;
+        if (allMissions[LevelProgress].scene_name == "") btn_Level.interactable = false;
+        else btn_Level.interactable = true;
     }
     public Mission_SCO getCurrentMission()
     {
@@ -49,8 +51,9 @@ public class Levels_Letters : MonoBehaviour
 
 
     async public void btn_StartLevel()
-    {
+    {   Events_SC.TriggerChangeLevel();
         await Tween.Alpha(img_fade, float_fade_on);
+        
         SceneManager.LoadScene(allMissions[LevelProgress].scene_name);
     }
     async public void btn_Home()

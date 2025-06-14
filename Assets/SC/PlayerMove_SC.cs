@@ -50,6 +50,7 @@ public class PlayerMove_SC : MonoBehaviour
             SetTargetToMousePosition();
             isMoving = true;
         }
+        if (Input.GetKey("esc")) Application.Quit();
 
         // Обработка наклона
         HandleTilt();

@@ -28,6 +28,8 @@ public class flower_picker_sc : MonoBehaviour
         if (wined) return;
         wined = true;
 
+
+        await Task.Delay(2000);
         Debug.LogError("WIN");
         nps_render.sprite = sprt_win;
         txt_win.SetActive(true);

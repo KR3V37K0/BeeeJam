@@ -11,12 +11,12 @@ public class PlayerGraber_SC : MonoBehaviour
     private List<GameObject> grabeds = new List<GameObject>();
     private void OnEnable()
     {
-        Events_SC.OnLevelWin += onWin;
+        Events_SC.OnLevelChange += onWin;
     }
 
     private void OnDisable()
     {
-        Events_SC.OnLevelWin -= onWin;
+        Events_SC.OnLevelChange -= onWin;
     }
     void Update()
     {
