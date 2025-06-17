@@ -15,6 +15,9 @@ GameObject:
   - component: {fileID: 2376727581736753961}
   - component: {fileID: 489847774318096262}
   - component: {fileID: 7535184703682402104}
+  - component: {fileID: 2633504695537773929}
+  - component: {fileID: 4204856676064681010}
+  - component: {fileID: 1783269000110454446}
   m_Layer: 3
   m_Name: _PLAYER
   m_TagString: Player
@@ -52,10 +55,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  rotationSpeed: 5
+  rotationSpeed: 3
   stopDistance: 0.18
   fixedZPosition: -2
-  tiltAmount: 20
+  tiltAmount: -20
   tiltSmoothness: 2
 --- !u!54 &6784605848503981519
 Rigidbody:
@@ -317,6 +320,46 @@ MonoBehaviour:
   pitch_m: 1.22
   random_strength: 0.02
   random_speed: 1000
+--- !u!114 &2633504695537773929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152404004920704478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acdd04d1fd91e9f48adbd599116e7895, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hat_mesh: {fileID: 1009429833504272916}
+--- !u!114 &4204856676064681010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152404004920704478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4455d1883b72524f9853e9941074e8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1783269000110454446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152404004920704478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84b86aad3d75fa847b1f40721d565207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: a9f4969ef1ae6854c86ad17df88a4e2a, type: 2}
+  volumeSlider: {fileID: 0}
+  exposedParam: MasterVolume
 --- !u!1 &5687284806082412461
 GameObject:
   m_ObjectHideFlags: 0
@@ -884,6 +927,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b648d4be4ceb6b4ca80ede03f66668c, type: 3}
+--- !u!33 &1009429833504272916 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -5754084199372789682, guid: 6b648d4be4ceb6b4ca80ede03f66668c,
+    type: 3}
+  m_PrefabInstance: {fileID: 4478642903367178842}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4156238068279098801 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6b648d4be4ceb6b4ca80ede03f66668c,

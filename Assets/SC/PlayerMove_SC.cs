@@ -50,7 +50,7 @@ public class PlayerMove_SC : MonoBehaviour
             SetTargetToMousePosition();
             isMoving = true;
         }
-        if (Input.GetKey("esc")) Application.Quit();
+        if (Input.GetKey(KeyCode.Escape)) Application.Quit();
 
         // Обработка наклона
         HandleTilt();
@@ -104,25 +104,22 @@ public class PlayerMove_SC : MonoBehaviour
             rb.position = new Vector3(rb.position.x, rb.position.y, fixedZPosition);
         }
     }
-
-   private void RotateTowards()
+    private void RotateTowards()
     {
         Vector3 direction = targetPosition - transform.position;
-        direction.z = 0;
         direction.y = 0;
-        
+        direction.z = 0;
+
         if (direction.magnitude < 0.01f) return;
-        
+
         direction.Normalize();
-        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        
-        // Основной поворот
+
+        // Разворачиваем в противоположную сторону (лицом к камере)
+        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 180f;
+
         Quaternion baseRotation = Quaternion.Euler(0, targetAngle, 0);
-        
-        // Добавляем наклон
         Quaternion tiltRotation = Quaternion.Euler(0, 0, currentTilt);
-        
-        // Комбинируем
+
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             baseRotation * tiltRotation,

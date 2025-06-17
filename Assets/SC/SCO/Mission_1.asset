@@ -17,4 +17,4 @@ MonoBehaviour:
     \u0443 \u043C\u0435\u043D\u044F \u043F\u0440\u043E\u0442\u0435\u043A\u0430\u0435\u0442
     \u043A\u0440\u044B\u0448\u0430. \u041F\u0440\u043E\u0448\u0443 \u043F\u043E\u043C\u043E\u0447\u044C."
   minBounds: {x: 4, y: 0}
-  maxBounds: {x: 30, y: 12}
+  maxBounds: {x: 30, y: 5.2}
